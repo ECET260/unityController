@@ -92,6 +92,7 @@ int main(void)
 
   /* USER CODE BEGIN 1 */
 	uint32_t count=0;
+	uint16_t checksum=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -127,18 +128,31 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  checksum=0;
+
 	  //accelerometer
 	  BSP_ACCELERO_GetXYZ(&XYZ);
 
-	  sprintf(myData, "XXX%04X%04X%04X", (uint16_t)XYZ[0], (uint16_t)XYZ[1], (uint16_t)XYZ[2]);
+	  sprintf(myData, "###%03d%04X%04X%04X", (uint16_t)count,(uint16_t)XYZ[0], (uint16_t)XYZ[1], (uint16_t)XYZ[2]);
 
+	  //3 ADCs
+	  sprintf(myData + strlen(myData), "%04d%04d%04d", (uint16_t)adcValues[0],(uint16_t)adcValues[1],(uint16_t)adcValues[2]);
 
+	  //8 Digital inputs
+	  sprintf(myData + strlen(myData), "10101010");
 
-	  sprintf(myData + strlen(myData), "%04d%04d%04d%04d%04d\n", (uint16_t)adcValues[0],(uint16_t)adcValues[1],(uint16_t)adcValues[2],(uint16_t)adcValues[3],(uint16_t)adcValues[4]);
+	  //calculate checksum
+	  for(int loop=0; loop<strlen(myData); loop++)
+	  {
+		  checksum += myData[loop];
+	  }
+	  checksum %=1000;	//3 digits
+	  sprintf(myData + strlen(myData), "%03d\r\n", checksum);
 
 	  //USBD_CDC_SetTxBuffer(&hUsbDeviceFS, myData, 7);
 	  CDC_Transmit_FS(myData, strlen((const char*)myData));
 	  count++;
+	  count%=1000;	//000-999
 	  HAL_Delay(1000);
   /* USER CODE END WHILE */
 
