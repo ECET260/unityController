@@ -56,14 +56,8 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define GreenLED_Pin GPIO_PIN_12
-#define GreenLED_GPIO_Port GPIOD
-#define OrangeLED_Pin GPIO_PIN_13
-#define OrangeLED_GPIO_Port GPIOD
-#define RedLED_Pin GPIO_PIN_14
-#define RedLED_GPIO_Port GPIOD
-#define BlueLED_Pin GPIO_PIN_15
-#define BlueLED_GPIO_Port GPIOD
+#define LCD_BL_Pin GPIO_PIN_12
+#define LCD_BL_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
 
