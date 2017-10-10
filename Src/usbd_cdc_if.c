@@ -64,6 +64,8 @@
   * @{
   */ 
 /* USER CODE BEGIN PRIVATE_TYPES */
+extern uint8_t receive_data[64];
+uint8_t _index=0;
 /* USER CODE END PRIVATE_TYPES */ 
 /**
   * @}
@@ -75,8 +77,8 @@
 /* USER CODE BEGIN PRIVATE_DEFINES */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  4
-#define APP_TX_DATA_SIZE  4
+#define APP_RX_DATA_SIZE  64
+#define APP_TX_DATA_SIZE  64
 /* USER CODE END PRIVATE_DEFINES */
 /**
   * @}
@@ -266,6 +268,11 @@ static int8_t CDC_Control_FS  (uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS (uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+  receive_data[_index]=Buf[0];
+  if(++_index==64)
+  {
+	  _index=0;
+  }
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
@@ -287,6 +294,7 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 7 */ 
+  memcpy(UserTxBufferFS,Buf,sizeof(uint8_t)*Len);
   USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceFS.pClassData;
   if (hcdc->TxState != 0){
     return USBD_BUSY;
