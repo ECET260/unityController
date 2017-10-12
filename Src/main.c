@@ -94,7 +94,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	uint32_t count=0;
+	uint16_t count=0;
 	uint16_t checksum=0;
   /* USER CODE END 1 */
 
@@ -125,6 +125,7 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   BSP_ACCELERO_Init();
+
   HAL_ADC_Start_DMA(&hadc1, adcValues, sizeof(uint32_t)*5);
   /* USER CODE END 2 */
 
@@ -135,7 +136,7 @@ int main(void)
 	  checksum=0;
 
 	  //accelerometer
-	  BSP_ACCELERO_GetXYZ(&XYZ);
+	  BSP_ACCELERO_GetXYZ(XYZ);
 
 	  sprintf(myData, "###%03d%04X%04X%04X", (uint16_t)count,(uint16_t)XYZ[0], (uint16_t)XYZ[1], (uint16_t)XYZ[2]);
 
@@ -156,7 +157,7 @@ int main(void)
 	  //USBD_CDC_SetTxBuffer(&hUsbDeviceFS, myData, 7);
 	  CDC_Transmit_FS(myData, strlen((const char*)myData));
 
-	  HAL_UART_Transmit(&huart2, "Hello\n", 6, 1000);
+	  HAL_UART_Transmit(&huart2, myData, strlen((const char*)myData), 1000);
 	  count++;
 	  count%=1000;	//000-999
 	  HAL_Delay(1000);
