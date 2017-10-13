@@ -56,8 +56,40 @@
 
 /* Private define ------------------------------------------------------------*/
 
+#define OUT4_Pin GPIO_PIN_2
+#define OUT4_GPIO_Port GPIOE
+#define OUT5_Pin GPIO_PIN_4
+#define OUT5_GPIO_Port GPIOE
+#define OUT6_Pin GPIO_PIN_5
+#define OUT6_GPIO_Port GPIOE
+#define OUT7_Pin GPIO_PIN_6
+#define OUT7_GPIO_Port GPIOE
+#define OUT0_Pin GPIO_PIN_0
+#define OUT0_GPIO_Port GPIOB
+#define OUT1_Pin GPIO_PIN_1
+#define OUT1_GPIO_Port GPIOB
+#define OUT2_Pin GPIO_PIN_2
+#define OUT2_GPIO_Port GPIOB
 #define LCD_BL_Pin GPIO_PIN_12
 #define LCD_BL_GPIO_Port GPIOD
+#define IN0_Pin GPIO_PIN_0
+#define IN0_GPIO_Port GPIOD
+#define IN1_Pin GPIO_PIN_1
+#define IN1_GPIO_Port GPIOD
+#define IN2_Pin GPIO_PIN_2
+#define IN2_GPIO_Port GPIOD
+#define IN3_Pin GPIO_PIN_3
+#define IN3_GPIO_Port GPIOD
+#define IN4_Pin GPIO_PIN_4
+#define IN4_GPIO_Port GPIOD
+#define IN5_Pin GPIO_PIN_5
+#define IN5_GPIO_Port GPIOD
+#define IN6_Pin GPIO_PIN_6
+#define IN6_GPIO_Port GPIOD
+#define IN7_Pin GPIO_PIN_7
+#define IN7_GPIO_Port GPIOD
+#define OUT3_Pin GPIO_PIN_4
+#define OUT3_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
