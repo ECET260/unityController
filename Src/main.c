@@ -330,6 +330,7 @@ static void MX_I2C1_Init(void)
 static void MX_SPI1_Init(void)
 {
 
+  /* SPI1 parameter configuration*/
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
@@ -396,7 +397,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -404,41 +404,37 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin 
+                          |OUT3B4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin 
+                          |LCD_BL_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LCD_BL_GPIO_Port, LCD_BL_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : OUT4_Pin OUT5_Pin OUT6_Pin OUT7_Pin */
-  GPIO_InitStruct.Pin = OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : OUT0_Pin OUT1_Pin OUT2_Pin OUT3_Pin */
-  GPIO_InitStruct.Pin = OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin;
+  /*Configure GPIO pins : OUT0_Pin OUT1_Pin OUT2_Pin OUT3_Pin 
+                           OUT3B4_Pin */
+  GPIO_InitStruct.Pin = OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin 
+                          |OUT3B4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LCD_BL_Pin */
-  GPIO_InitStruct.Pin = LCD_BL_Pin;
+  /*Configure GPIO pins : OUT4_Pin OUT5_Pin OUT6_Pin OUT7_Pin 
+                           LCD_BL_Pin */
+  GPIO_InitStruct.Pin = OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin 
+                          |LCD_BL_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LCD_BL_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : IN0_Pin IN1_Pin IN2_Pin IN3_Pin 
-                           IN4_Pin IN5_Pin IN6_Pin IN7_Pin */
-  GPIO_InitStruct.Pin = IN0_Pin|IN1_Pin|IN2_Pin|IN3_Pin 
-                          |IN4_Pin|IN5_Pin|IN6_Pin|IN7_Pin;
+  /*Configure GPIO pins : IN7_Pin IN5_Pin IN6_Pin IN3_Pin 
+                           IN4_Pin IN1_Pin IN2_Pin IN0_Pin */
+  GPIO_InitStruct.Pin = IN7_Pin|IN5_Pin|IN6_Pin|IN3_Pin 
+                          |IN4_Pin|IN1_Pin|IN2_Pin|IN0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
 }
@@ -474,14 +470,35 @@ void parseRx(void)
 				  break;
 				  //digital outputs
 			  case 3:
+				  HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 4:
+				  HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 5:
+				  HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 6:
+				  HAL_GPIO_WritePin(OUT4_GPIO_Port, OUT4_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 7:
+				  HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 8:
+				  HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 9:
+				  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin,receive_serial[loop]-0x30);
+				  state++;
+				  break;
 			  case 10:
-				  HAL_GPIO_WritePin(OUT0_GPIO_Port, 1<<(10-state),receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT0_GPIO_Port, OUT0_Pin,receive_serial[loop]-0x30);
 				  state++;
 				  break;
 			  case 11:
