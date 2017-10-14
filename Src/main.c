@@ -73,8 +73,7 @@ uint8_t myData[64] = "hello\n";
 int16_t XYZ[3];
 uint32_t adcValues[5];
 uint8_t inputPort[8];
-uint16_t rxCount=0;
-uint16_t rxChecksum=0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -146,7 +145,7 @@ int main(void)
 	  sprintf(myData, "###%03d%04X%04X%04X", (uint16_t)count,(uint16_t)XYZ[0], (uint16_t)XYZ[1], (uint16_t)XYZ[2]);
 
 	  //3 ADCs
-	  sprintf(myData + strlen(myData), "%04d%04d%04d", (uint16_t)adcValues[0],(uint16_t)adcValues[1],(uint16_t)adcValues[2]);
+	  sprintf(myData + 18, "%04d%04d%04d", (uint16_t)adcValues[0],(uint16_t)adcValues[1],(uint16_t)adcValues[2]);
 
 	  //8 Digital inputs
 	  inputPort[7] = (uint8_t)HAL_GPIO_ReadPin(IN7_GPIO_Port,IN7_Pin);
@@ -158,28 +157,28 @@ int main(void)
 	  inputPort[1] = (uint8_t)HAL_GPIO_ReadPin(IN1_GPIO_Port,IN1_Pin);
 	  inputPort[0] = (uint8_t)HAL_GPIO_ReadPin(IN0_GPIO_Port,IN0_Pin);
 
-	  sprintf(myData + strlen(myData), "%d", inputPort[7]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[6]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[5]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[4]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[3]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[2]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[1]);
-	  sprintf(myData + strlen(myData), "%d", inputPort[0]);
+	  sprintf(myData + 30, "%0d", inputPort[7]); //strlen(myData)
+	  sprintf(myData + 31, "%0d", inputPort[6]);
+	  sprintf(myData + 32, "%0d", inputPort[5]);
+	  sprintf(myData + 33, "%0d", inputPort[4]);
+	  sprintf(myData + 34, "%0d", inputPort[3]);
+	  sprintf(myData + 35, "%0d", inputPort[2]);
+	  sprintf(myData + 36, "%0d", inputPort[1]);
+	  sprintf(myData + 37, "%0d", inputPort[0]);
 
 
 	  //calculate checksum
-	  for(int loop=3; loop<strlen(myData); loop++)
+	  for(int loop=3; loop<=strlen(myData); loop++)
 	  {
 		  checksum += myData[loop];
 	  }
 	  checksum %=1000;	//3 digits
-	  sprintf(myData + strlen(myData), "%03d\r\n", checksum);
+	  sprintf(myData + 38, "%03d\r\n", checksum);
 
 	  //USBD_CDC_SetTxBuffer(&hUsbDeviceFS, myData, 7);
-	  CDC_Transmit_FS(myData, strlen((const char*)myData));
+	  CDC_Transmit_FS(myData, 43);  //strlen((const char*)myData)
 
-	  HAL_UART_Transmit(&huart2, myData, strlen((const char*)myData), 1000);
+	  HAL_UART_Transmit(&huart2, myData, 43, 1000); //strlen((const char*)myData)
 	  count++;
 	  count%=1000;	//000-999
 
@@ -397,24 +396,34 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOH_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin 
-                          |OUT3B4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin 
                           |LCD_BL_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : OUT0_Pin OUT1_Pin OUT2_Pin OUT3_Pin 
-                           OUT3B4_Pin */
-  GPIO_InitStruct.Pin = OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin 
-                          |OUT3B4_Pin;
+  /*Configure GPIO pins : IN3_Pin IN1_Pin IN2_Pin */
+  GPIO_InitStruct.Pin = IN3_Pin|IN1_Pin|IN2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : IN0_Pin */
+  GPIO_InitStruct.Pin = IN0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(IN0_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : OUT0_Pin OUT1_Pin OUT2_Pin OUT3_Pin */
+  GPIO_InitStruct.Pin = OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -429,13 +438,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : IN7_Pin IN5_Pin IN6_Pin IN3_Pin 
-                           IN4_Pin IN1_Pin IN2_Pin IN0_Pin */
-  GPIO_InitStruct.Pin = IN7_Pin|IN5_Pin|IN6_Pin|IN3_Pin 
-                          |IN4_Pin|IN1_Pin|IN2_Pin|IN0_Pin;
+  /*Configure GPIO pin : IN7_Pin */
+  GPIO_InitStruct.Pin = IN7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  HAL_GPIO_Init(IN7_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : IN5_Pin IN6_Pin IN4_Pin */
+  GPIO_InitStruct.Pin = IN5_Pin|IN6_Pin|IN4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -446,8 +459,8 @@ void parseRx(void)
 	  if(strlen(receive_serial)>0)
 	  {
 		  int state=0; //state machine
-		  int rxChecksum=0;
-		  int rxCount=0;
+		  volatile int rxChecksum=0;
+		  int calcChecksum=0;
 
 		  HAL_UART_Transmit(&huart2, receive_serial, strlen((const char*)receive_serial), 500);
 		  for(int loop=0; loop<strlen((const char*)receive_serial); loop++)
@@ -459,70 +472,72 @@ void parseRx(void)
 			  case 2:
 				  if(receive_serial[loop]=='#')
 				  {
-					  rxCount++;
 					  state++;
 				  }
 				  else
 				  {
-					  rxCount=0;
 					  state=0;
 				  }
 				  break;
 				  //digital outputs
 			  case 3:
-				  HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin,receive_serial[loop]-0x30);
+				  //checksum 384-392
+				  for(int count=3; count<11; count++)
+				  {
+					  calcChecksum+=receive_serial[count];
+				  }
+				  rxChecksum = (receive_serial[11]-'0') * 100;
+				  rxChecksum += (receive_serial[12]-'0') * 10;
+				  rxChecksum += (receive_serial[13]-'0');
+
+				  if(calcChecksum==rxChecksum) //valid checksum?
+				  {
+				  HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin,receive_serial[loop]-'0'); 	//yes
 				  state++;
+				  }
+				  else
+				  {
+					  state=0;	//no
+				  }
 				  break;
 			  case 4:
-				  HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin,receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 			  case 5:
-				  HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin,receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 			  case 6:
-				  HAL_GPIO_WritePin(OUT4_GPIO_Port, OUT4_Pin,receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT4_GPIO_Port, OUT4_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 			  case 7:
-				  HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin,receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 			  case 8:
-				  HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin,receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 			  case 9:
-				  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin,receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 			  case 10:
-				  HAL_GPIO_WritePin(OUT0_GPIO_Port, OUT0_Pin,receive_serial[loop]-0x30);
-				  state++;
-				  break;
-			  case 11:
-				  rxChecksum = (receive_serial[loop]-0x30) * 100;
-				  state++;
-				  break;
-			  case 12:
-				  rxChecksum += (receive_serial[loop]-0x30) * 10;
-				  state++;
-				  break;
-			  case 13:
-				  rxChecksum += (receive_serial[loop]-0x30);
+				  HAL_GPIO_WritePin(OUT0_GPIO_Port, OUT0_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 
 
 			  }
 
-	//mel		  rxChecksum+=receive_serial[i];
+
 
 			  }
 
 		  }
-		  rxCount=0;
+
 		  receive_serial[0]=0;
 
 
