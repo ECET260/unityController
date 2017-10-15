@@ -71,7 +71,7 @@ uint8_t receive_data[64];
 uint8_t receive_serial[64];
 uint8_t myData[64] = "hello\n";
 int16_t XYZ[3];
-uint32_t adcValues[5];
+uint16_t adcValues[3];
 uint8_t inputPort[8];
 
 /* USER CODE END PV */
@@ -130,7 +130,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   BSP_ACCELERO_Init();
 
-  HAL_ADC_Start_DMA(&hadc1, adcValues, sizeof(uint32_t)*5);
+  HAL_ADC_Start_DMA(&hadc1, adcValues, sizeof(uint32_t)*3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -279,7 +279,7 @@ static void MX_ADC1_Init(void)
     */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
