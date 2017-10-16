@@ -157,6 +157,7 @@ int main(void)
 	  inputPort[1] = (uint8_t)HAL_GPIO_ReadPin(IN1_GPIO_Port,IN1_Pin);
 	  inputPort[0] = (uint8_t)HAL_GPIO_ReadPin(IN0_GPIO_Port,IN0_Pin);
 
+	  //8 digital inputs
 	  sprintf(myData + 30, "%0d", inputPort[7]); //strlen(myData)
 	  sprintf(myData + 31, "%0d", inputPort[6]);
 	  sprintf(myData + 32, "%0d", inputPort[5]);
@@ -176,9 +177,9 @@ int main(void)
 	  sprintf(myData + 38, "%03d\r\n", checksum);
 
 	  //USBD_CDC_SetTxBuffer(&hUsbDeviceFS, myData, 7);
-	  CDC_Transmit_FS(myData, 43);  //strlen((const char*)myData)
+	  CDC_Transmit_FS(myData, 43);  //micro usb 		-- strlen((const char*)myData)
 
-	  HAL_UART_Transmit(&huart2, myData, 43, 1000); //strlen((const char*)myData)
+	  HAL_UART_Transmit(&huart2, myData, 43, 1000); //mini usb uart to stlink 	-- strlen((const char*)myData)
 	  count++;
 	  count%=1000;	//000-999
 
