@@ -87,6 +87,7 @@ static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
+extern initialise_monitor_handles(void); //semihosting
 void parseRx(void);
 /* USER CODE END PFP */
 
@@ -128,6 +129,7 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
+  initialise_monitor_handles(); //semihosting
   BSP_ACCELERO_Init();
 
   HAL_ADC_Start_DMA(&hadc1, adcValues, sizeof(uint32_t)*3);
@@ -143,6 +145,7 @@ int main(void)
 	  BSP_ACCELERO_GetXYZ(XYZ);
 
 	  sprintf(myData, "###%03d%04X%04X%04X", (uint16_t)count,(uint16_t)XYZ[0], (uint16_t)XYZ[1], (uint16_t)XYZ[2]);
+	  printf("X: %0.2f\tY: %0.2f\tZ: %0.2f\n", (float)XYZ[0], (float)XYZ[1], (float)XYZ[2]);
 
 	  //3 ADCs
 	  sprintf(myData + 18, "%04d%04d%04d", (uint16_t)adcValues[0],(uint16_t)adcValues[1],(uint16_t)adcValues[2]);
@@ -180,6 +183,7 @@ int main(void)
 	  CDC_Transmit_FS(myData, 43);  //micro usb 		-- strlen((const char*)myData)
 
 	  HAL_UART_Transmit(&huart2, myData, 43, 1000); //mini usb uart to stlink 	-- strlen((const char*)myData)
+	  //printf("%s", myData);  //semihosting - console
 	  count++;
 	  count%=1000;	//000-999
 
