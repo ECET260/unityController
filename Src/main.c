@@ -87,7 +87,9 @@ static void MX_USART2_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-extern initialise_monitor_handles(void); //semihosting
+#ifdef SEMIHOSTING
+extern int initialise_monitor_handles(void); //semihosting
+#endif
 void parseRx(void);
 /* USER CODE END PFP */
 
@@ -129,10 +131,12 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
+#ifdef SEMIHOSTING
   initialise_monitor_handles(); //semihosting
+#endif
   BSP_ACCELERO_Init();
 
-  HAL_ADC_Start_DMA(&hadc1, adcValues, sizeof(uint32_t)*3);
+  HAL_ADC_Start_DMA(&hadc1, adcValues, sizeof(uint16_t)*3);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -145,8 +149,9 @@ int main(void)
 	  BSP_ACCELERO_GetXYZ(XYZ);
 
 	  sprintf(myData, "###%03d%04X%04X%04X", (uint16_t)count,(uint16_t)XYZ[0], (uint16_t)XYZ[1], (uint16_t)XYZ[2]);
+#ifdef SEMIHOSTING
 	  printf("X: %0.2f\tY: %0.2f\tZ: %0.2f\n", (float)XYZ[0], (float)XYZ[1], (float)XYZ[2]);
-
+#endif
 	  //3 ADCs
 	  sprintf(myData + 18, "%04d%04d%04d", (uint16_t)adcValues[0],(uint16_t)adcValues[1],(uint16_t)adcValues[2]);
 
