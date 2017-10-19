@@ -175,6 +175,8 @@ int main(void)
 	  sprintf(myData + 36, "%0d", inputPort[1]);
 	  sprintf(myData + 37, "%0d", inputPort[0]);
 
+	  //Blue Button
+	  sprintf(myData + 38, "%0d", HAL_GPIO_ReadPin(blueButton_GPIO_Port, blueButton_Pin));
 
 	  //calculate checksum
 	  for(int loop=3; loop<=strlen(myData); loop++)
@@ -182,12 +184,12 @@ int main(void)
 		  checksum += myData[loop];
 	  }
 	  checksum %=1000;	//3 digits
-	  sprintf(myData + 38, "%03d\r\n", checksum);
+	  sprintf(myData + 39, "%03d\r\n", checksum);
 
 	  //USBD_CDC_SetTxBuffer(&hUsbDeviceFS, myData, 7);
-	  CDC_Transmit_FS(myData, 43);  //micro usb 		-- strlen((const char*)myData)
+	  CDC_Transmit_FS(myData, 44);  //micro usb 		-- strlen((const char*)myData)
 
-	  HAL_UART_Transmit(&huart2, myData, 43, 1000); //mini usb uart to stlink 	-- strlen((const char*)myData)
+	  HAL_UART_Transmit(&huart2, myData, 44, 1000); //mini usb uart to stlink 	-- strlen((const char*)myData)
 	  //printf("%s", myData);  //semihosting - console
 	  count++;
 	  count%=1000;	//000-999
@@ -418,7 +420,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin 
-                          |LCD_BL_Pin, GPIO_PIN_RESET);
+                          |greenLED_Pin|orangeLED_Pin|redLED_Pin|blueLED_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : IN3_Pin IN1_Pin IN2_Pin */
   GPIO_InitStruct.Pin = IN3_Pin|IN1_Pin|IN2_Pin;
@@ -432,6 +434,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(IN0_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : blueButton_Pin */
+  GPIO_InitStruct.Pin = blueButton_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(blueButton_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : OUT0_Pin OUT1_Pin OUT2_Pin OUT3_Pin */
   GPIO_InitStruct.Pin = OUT0_Pin|OUT1_Pin|OUT2_Pin|OUT3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -440,9 +448,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : OUT4_Pin OUT5_Pin OUT6_Pin OUT7_Pin 
-                           LCD_BL_Pin */
+                           greenLED_Pin orangeLED_Pin redLED_Pin blueLED_Pin */
   GPIO_InitStruct.Pin = OUT4_Pin|OUT5_Pin|OUT6_Pin|OUT7_Pin 
-                          |LCD_BL_Pin;
+                          |greenLED_Pin|orangeLED_Pin|redLED_Pin|blueLED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -492,13 +500,13 @@ void parseRx(void)
 				  //digital outputs
 			  case 3:
 				  //checksum 384-392
-				  for(int count=3; count<11; count++)
+				  for(int count=3; count<15; count++)
 				  {
 					  calcChecksum+=receive_serial[count];
 				  }
-				  rxChecksum = (receive_serial[11]-'0') * 100;
-				  rxChecksum += (receive_serial[12]-'0') * 10;
-				  rxChecksum += (receive_serial[13]-'0');
+				  rxChecksum = (receive_serial[15]-'0') * 100;
+				  rxChecksum += (receive_serial[16]-'0') * 10;
+				  rxChecksum += (receive_serial[17]-'0');
 
 				  if(calcChecksum==rxChecksum) //valid checksum?
 				  {
@@ -536,6 +544,22 @@ void parseRx(void)
 				  break;
 			  case 10:
 				  HAL_GPIO_WritePin(OUT0_GPIO_Port, OUT0_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 11:
+				  HAL_GPIO_WritePin(blueLED_GPIO_Port, blueLED_Pin, receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 12:
+				  HAL_GPIO_WritePin(redLED_GPIO_Port, redLED_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 13:
+				  HAL_GPIO_WritePin(orangeLED_GPIO_Port, orangeLED_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 14:
+				  HAL_GPIO_WritePin(greenLED_GPIO_Port, greenLED_Pin,receive_serial[loop]-'0');
 				  state++;
 				  break;
 

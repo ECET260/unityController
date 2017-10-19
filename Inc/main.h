@@ -64,6 +64,8 @@
 #define IN2_GPIO_Port GPIOE
 #define IN0_Pin GPIO_PIN_13
 #define IN0_GPIO_Port GPIOC
+#define blueButton_Pin GPIO_PIN_0
+#define blueButton_GPIO_Port GPIOC
 #define OUT0_Pin GPIO_PIN_12
 #define OUT0_GPIO_Port GPIOB
 #define OUT1_Pin GPIO_PIN_13
@@ -80,8 +82,14 @@
 #define OUT6_GPIO_Port GPIOD
 #define OUT7_Pin GPIO_PIN_11
 #define OUT7_GPIO_Port GPIOD
-#define LCD_BL_Pin GPIO_PIN_12
-#define LCD_BL_GPIO_Port GPIOD
+#define greenLED_Pin GPIO_PIN_12
+#define greenLED_GPIO_Port GPIOD
+#define orangeLED_Pin GPIO_PIN_13
+#define orangeLED_GPIO_Port GPIOD
+#define redLED_Pin GPIO_PIN_14
+#define redLED_GPIO_Port GPIOD
+#define blueLED_Pin GPIO_PIN_15
+#define blueLED_GPIO_Port GPIOD
 #define IN7_Pin GPIO_PIN_7
 #define IN7_GPIO_Port GPIOD
 #define IN5_Pin GPIO_PIN_4
