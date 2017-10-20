@@ -65,7 +65,7 @@
 #define IN0_Pin GPIO_PIN_13
 #define IN0_GPIO_Port GPIOC
 #define blueButton_Pin GPIO_PIN_0
-#define blueButton_GPIO_Port GPIOC
+#define blueButton_GPIO_Port GPIOA
 #define OUT0_Pin GPIO_PIN_12
 #define OUT0_GPIO_Port GPIOB
 #define OUT1_Pin GPIO_PIN_13

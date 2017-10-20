@@ -197,7 +197,7 @@ int main(void)
 	  parseRx();
 
 
-	  HAL_Delay(20);
+	  HAL_Delay(10);
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -499,7 +499,7 @@ void parseRx(void)
 				  break;
 				  //digital outputs
 			  case 3:
-				  //checksum 384-392,  576-588
+				  //checksum 576-588 with onboard LEDs, was 384-392
 				  for(int count=3; count<15; count++)
 				  {
 					  calcChecksum+=receive_serial[count];
