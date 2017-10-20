@@ -499,7 +499,7 @@ void parseRx(void)
 				  break;
 				  //digital outputs
 			  case 3:
-				  //checksum 384-392
+				  //checksum 384-392,  576-588
 				  for(int count=3; count<15; count++)
 				  {
 					  calcChecksum+=receive_serial[count];
