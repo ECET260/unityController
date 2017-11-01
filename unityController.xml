@@ -10,8 +10,8 @@
 ]>
 
 <targetDefinitions>
-  <board id="accelerometer">
-    <name>Accelerometer</name>
+  <board id="unitycontroller">
+    <name>unityController</name>
     <dbgIF>SWD</dbgIF>
     <dbgDEV>ST-Link</dbgDEV>
     <mcuId>stm32f407vgtx</mcuId>
