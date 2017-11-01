@@ -7,7 +7,8 @@ Attach the UART2 pins PA2 and PA3 to the STLink processor.
 Anything you send out UART2 in your code will show on the virtual com port on th STLINK.
 
 The following describes the components that make up the protocol:
-The ARM will send the following packet once each time interval.
+
+#The ARM will send the following packet once each time interval.
 
 Default time interval 0.1 second. The packet will be ASCII values.   
 
@@ -37,7 +38,7 @@ The next three characters are the checksum:		000 to 999
 
 The next 2 characters are \r\n					
 
-The GUI can send the following to the ARM at any time you require for you project. The packet will be ASCII values.
+#The GUI can send the following to the ARM at any time you require for you project. The packet will be ASCII values.
 
 The start of packet is 3 # signs:					###
 
