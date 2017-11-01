@@ -35,7 +35,7 @@ The blue button (PA0)						0 to 1
 
 The next three characters are the checksum:		000 to 999
 
-The next 2 characters are \r\n					\r\n
+The next 2 characters are \r\n					
 
 The GUI can send the following to the ARM at any time you require for you project. The packet will be ASCII values.
 
