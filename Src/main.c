@@ -200,7 +200,7 @@ int main(void)
 	  count%=1000;	//000-999
 
 	  parseRx();
-	  parseRx6();
+
 
 	  HAL_Delay(10);
   /* USER CODE END WHILE */
@@ -601,111 +601,7 @@ void parseRx(void)
 
 }
 
-void parseRx6(void)
-{
-	  HAL_UART_Receive(&huart6, receive_serial, 50, 500 );
-	  if(strlen(receive_serial)>0)
-	  {
-		  int state=0; //state machine
-		  volatile int rxChecksum=0;
-		  int calcChecksum=0;
 
-		  HAL_UART_Transmit(&huart6, receive_serial, strlen((const char*)receive_serial), 500);
-		  for(int loop=0; loop<strlen((const char*)receive_serial); loop++)
-		  {
-			  switch(state)
-			  {
-			  case 0:
-			  case 1:
-			  case 2:
-				  if(receive_serial[loop]=='#')
-				  {
-					  state++;
-				  }
-				  else
-				  {
-					  state=0;
-				  }
-				  break;
-				  //digital outputs
-			  case 3:
-				  //checksum 576-588 with onboard LEDs, was 384-392
-				  for(int count=3; count<15; count++)
-				  {
-					  calcChecksum+=receive_serial[count];
-				  }
-				  rxChecksum = (receive_serial[15]-'0') * 100;
-				  rxChecksum += (receive_serial[16]-'0') * 10;
-				  rxChecksum += (receive_serial[17]-'0');
-
-				  if(calcChecksum==rxChecksum) //valid checksum?
-				  {
-				  HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin,receive_serial[loop]-'0'); 	//yes
-				  state++;
-				  }
-				  else
-				  {
-					  state=0;	//no
-				  }
-				  break;
-			  case 4:
-				  HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 5:
-				  HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 6:
-				  HAL_GPIO_WritePin(OUT4_GPIO_Port, OUT4_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 7:
-				  HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 8:
-				  HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 9:
-				  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 10:
-				  HAL_GPIO_WritePin(OUT0_GPIO_Port, OUT0_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 11:
-				  HAL_GPIO_WritePin(blueLED_GPIO_Port, blueLED_Pin, receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 12:
-				  HAL_GPIO_WritePin(redLED_GPIO_Port, redLED_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 13:
-				  HAL_GPIO_WritePin(orangeLED_GPIO_Port, orangeLED_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-			  case 14:
-				  HAL_GPIO_WritePin(greenLED_GPIO_Port, greenLED_Pin,receive_serial[loop]-'0');
-				  state++;
-				  break;
-
-
-			  }
-
-
-
-			  }
-
-		  }
-
-		  receive_serial[0]=0;
-
-
-}
 /* USER CODE END 4 */
 
 /**
