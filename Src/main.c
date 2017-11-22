@@ -64,6 +64,7 @@ I2C_HandleTypeDef hi2c1;
 SPI_HandleTypeDef hspi1;
 
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -84,6 +85,7 @@ static void MX_SPI1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_USART6_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -91,6 +93,7 @@ static void MX_USART2_UART_Init(void);
 extern int initialise_monitor_handles(void); //semihosting
 #endif
 void parseRx(void);
+void parseRx6(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -129,6 +132,7 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_USART2_UART_Init();
+  MX_USART6_UART_Init();
 
   /* USER CODE BEGIN 2 */
 #ifdef SEMIHOSTING
@@ -190,12 +194,13 @@ int main(void)
 	  CDC_Transmit_FS(myData, 44);  //micro usb 		-- strlen((const char*)myData)
 
 	  HAL_UART_Transmit(&huart2, myData, 44, 1000); //mini usb uart to stlink 	-- strlen((const char*)myData)
+	  HAL_UART_Transmit(&huart6, myData, 44, 1000); //PC6 PC7 - connect to nodemcu
 	  //printf("%s", myData);  //semihosting - console
 	  count++;
 	  count%=1000;	//000-999
 
 	  parseRx();
-
+	  parseRx6();
 
 	  HAL_Delay(10);
   /* USER CODE END WHILE */
@@ -380,6 +385,25 @@ static void MX_USART2_UART_Init(void)
 
 }
 
+/* USART6 init function */
+static void MX_USART6_UART_Init(void)
+{
+
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 57600;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+}
+
 /** 
   * Enable DMA controller clock
   */
@@ -481,6 +505,112 @@ void parseRx(void)
 		  int calcChecksum=0;
 
 		  HAL_UART_Transmit(&huart2, receive_serial, strlen((const char*)receive_serial), 500);
+		  for(int loop=0; loop<strlen((const char*)receive_serial); loop++)
+		  {
+			  switch(state)
+			  {
+			  case 0:
+			  case 1:
+			  case 2:
+				  if(receive_serial[loop]=='#')
+				  {
+					  state++;
+				  }
+				  else
+				  {
+					  state=0;
+				  }
+				  break;
+				  //digital outputs
+			  case 3:
+				  //checksum 576-588 with onboard LEDs, was 384-392
+				  for(int count=3; count<15; count++)
+				  {
+					  calcChecksum+=receive_serial[count];
+				  }
+				  rxChecksum = (receive_serial[15]-'0') * 100;
+				  rxChecksum += (receive_serial[16]-'0') * 10;
+				  rxChecksum += (receive_serial[17]-'0');
+
+				  if(calcChecksum==rxChecksum) //valid checksum?
+				  {
+				  HAL_GPIO_WritePin(OUT7_GPIO_Port, OUT7_Pin,receive_serial[loop]-'0'); 	//yes
+				  state++;
+				  }
+				  else
+				  {
+					  state=0;	//no
+				  }
+				  break;
+			  case 4:
+				  HAL_GPIO_WritePin(OUT6_GPIO_Port, OUT6_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 5:
+				  HAL_GPIO_WritePin(OUT5_GPIO_Port, OUT5_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 6:
+				  HAL_GPIO_WritePin(OUT4_GPIO_Port, OUT4_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 7:
+				  HAL_GPIO_WritePin(OUT3_GPIO_Port, OUT3_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 8:
+				  HAL_GPIO_WritePin(OUT2_GPIO_Port, OUT2_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 9:
+				  HAL_GPIO_WritePin(OUT1_GPIO_Port, OUT1_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 10:
+				  HAL_GPIO_WritePin(OUT0_GPIO_Port, OUT0_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 11:
+				  HAL_GPIO_WritePin(blueLED_GPIO_Port, blueLED_Pin, receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 12:
+				  HAL_GPIO_WritePin(redLED_GPIO_Port, redLED_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 13:
+				  HAL_GPIO_WritePin(orangeLED_GPIO_Port, orangeLED_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+			  case 14:
+				  HAL_GPIO_WritePin(greenLED_GPIO_Port, greenLED_Pin,receive_serial[loop]-'0');
+				  state++;
+				  break;
+
+
+			  }
+
+
+
+			  }
+
+		  }
+
+		  receive_serial[0]=0;
+
+
+}
+
+void parseRx6(void)
+{
+	  HAL_UART_Receive(&huart6, receive_serial, 50, 500 );
+	  if(strlen(receive_serial)>0)
+	  {
+		  int state=0; //state machine
+		  volatile int rxChecksum=0;
+		  int calcChecksum=0;
+
+		  HAL_UART_Transmit(&huart6, receive_serial, strlen((const char*)receive_serial), 500);
 		  for(int loop=0; loop<strlen((const char*)receive_serial); loop++)
 		  {
 			  switch(state)
